@@ -5,6 +5,8 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static net.minecraft.item.Items.register;
+
 public class DivingPack implements ModInitializer {
 	public static final String MOD_ID = "divingpack";
 
