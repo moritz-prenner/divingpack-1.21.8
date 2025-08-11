@@ -1,6 +1,7 @@
 package com.example;
 
 
+import items.ModItems;
 import net.fabricmc.api.ModInitializer;
 
 public class DivingPack implements ModInitializer {
@@ -8,6 +9,6 @@ public class DivingPack implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
+        ModItems.registerModItems();
     }
 }
