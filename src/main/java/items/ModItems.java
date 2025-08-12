@@ -14,6 +14,7 @@ import net.minecraft.util.Identifier;
 public class ModItems {
     public static final Item DIVING_WATCH = registerItem("diving_watch", new Item(new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DivingPack.MOD_ID,"diving_watch")))));
     public static final Item DIVING_FINS = registerItem("diving_fins", new Item(new Item.Settings().armor(ArmorMaterials.IRON, EquipmentType.BOOTS).registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DivingPack.MOD_ID,"diving_fins")))));
+    public static final Item OXYGEN_TANK = registerItem("oxygen_tank", new Item(new Item.Settings().armor(ArmorMaterials.LEATHER, EquipmentType.CHESTPLATE).registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(DivingPack.MOD_ID,"oxygen_tank")))));
 
     public static Item registerItem(String name, Item item) {
         return Registry.register(Registries.ITEM, Identifier.of(DivingPack.MOD_ID, name), item);
@@ -27,6 +28,7 @@ public class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(entries -> {
             entries.add(DIVING_FINS);
+            entries.add(OXYGEN_TANK);
         });
     }
 }
