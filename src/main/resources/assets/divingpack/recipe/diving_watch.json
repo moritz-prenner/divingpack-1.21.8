@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:compass",
+    "minecraft:heart_of_the_sea"
+  ],
+  "result": {}
+}

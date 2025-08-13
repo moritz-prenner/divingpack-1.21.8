@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "iHi",
+    "iii"
+  ],
+  "key": {
+    "i": "minecraft:iron_ingot",
+    "H": "minecraft:heart_of_the_sea"
+  },
+  "result": {}
+}

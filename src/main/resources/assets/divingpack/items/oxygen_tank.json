@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "divingpack:item/oxygen_tank"
+  "model": {
+    "type": "minecraft:model",
+    "model": "divingpack:item/oxygen_tank"
   }
 }
