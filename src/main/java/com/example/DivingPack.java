@@ -25,6 +25,7 @@ import java.util.UUID;
 public class DivingPack implements ModInitializer {
     public static final String MOD_ID = "divingpack";
     StatusEffectInstance UNLIMITED_WATER_BREATHING = new StatusEffectInstance(StatusEffects.WATER_BREATHING,200, 0, false, false, true);
+    StatusEffectInstance UNLIMITED_SPEED = new StatusEffectInstance(StatusEffects.SPEED,200, 0, false, false, true);
 
     @Override
     public void onInitialize() {
@@ -33,21 +34,19 @@ public class DivingPack implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 boolean holdsDivingWatch = isHoldingItem(player);
-                boolean wearsFins = isWearingArmorPiece(player, EquipmentSlot.FEET, ModItems.DIVING_FINS);
-                boolean wearsTank = isWearingArmorPiece(player, EquipmentSlot.CHEST, ModItems.OXYGEN_TANK);
 
                 if (holdsDivingWatch) {
                     int playerBlockY = player.getBlockY();
                     player.sendMessage(Text.literal(String.valueOf("Your current height is: " + playerBlockY)).formatted(Formatting.BLUE), true);
                 }
-                if (wearsFins) {
-                    player.setMovementSpeed(10000.0f);
-                    player.sendMessage(Text.literal(String.valueOf("more speed")).formatted(Formatting.BLUE), false);
-                }
-                else  {
-                    player.setMovementSpeed(0.1f);
-                    player.sendMessage(Text.literal(String.valueOf("less speed")).formatted(Formatting.BLUE), false);
-                }
+
+            }
+        });
+
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                boolean wearsTank = isWearingArmorPiece(player, EquipmentSlot.CHEST, ModItems.OXYGEN_TANK);
+
                 if (wearsTank) {
                     player.addStatusEffect(UNLIMITED_WATER_BREATHING);
                 }
@@ -57,7 +56,28 @@ public class DivingPack implements ModInitializer {
             }
         });
 
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                boolean wearsFins = isWearingArmorPiece(player, EquipmentSlot.FEET, ModItems.DIVING_FINS);
+
+                if (wearsFins) {
+                    boolean submergedUnderwater = player.isSubmergedInWater();
+
+                    if (submergedUnderwater) {
+                        player.addStatusEffect(UNLIMITED_SPEED);
+                    } else {
+                        player.removeStatusEffect(StatusEffects.SPEED);
+                    }
+
+                }
+
+
+            }
+        });
+
+
     }
+
 
     private boolean isHoldingItem(ServerPlayerEntity player) {
         return player.getStackInHand(Hand.MAIN_HAND).isOf(ModItems.DIVING_WATCH) || player.getStackInHand(Hand.OFF_HAND).isOf(ModItems.DIVING_WATCH);
