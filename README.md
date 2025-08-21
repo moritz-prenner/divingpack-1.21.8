@@ -6,9 +6,9 @@ This Mod adds new diving equipment to the game.
 
 ## Features:
 
-A Diving Watch that displays the players current height
-Diving Fins that make you swim faster
-An Oxygen Tank that lets you breathe underwater
+- A Diving Watch that displays the players current height
+- Diving Fins that make you swim faster
+- An Oxygen Tank that lets you breathe underwater
 
 ## Requirements:
 
