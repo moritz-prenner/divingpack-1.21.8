@@ -2,8 +2,11 @@ package com.example;
 
 import items.ModItems;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
@@ -12,17 +15,35 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.item.equipment.ArmorMaterial.*;
+
+import java.util.ArrayList;
 
 
 public class DivingPack implements ModInitializer {
     public static final String MOD_ID = "divingpack";
+
     StatusEffectInstance UNLIMITED_WATER_BREATHING = new StatusEffectInstance(StatusEffects.WATER_BREATHING,200, 0, false, false, true);
     StatusEffectInstance UNLIMITED_SPEED = new StatusEffectInstance(StatusEffects.SPEED,200, 0, false, false, true);
+    StatusEffectInstance UNLIMITED_GLOWING = new StatusEffectInstance(StatusEffects.GLOWING,200, 0, false, false, true);
+
+    ArrayList<LivingEntity> currentLivingEntitiesLoaded = new ArrayList<>();
 
     @Override
     public void onInitialize() {
         ModItems.registerModItems();
+
+        ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+            if (entity instanceof LivingEntity) {
+                currentLivingEntitiesLoaded.add((LivingEntity) entity);
+
+            }
+        });
+
+        ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
+            if (entity instanceof LivingEntity) {
+                currentLivingEntitiesLoaded.remove((LivingEntity) entity);
+            }
+        });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
@@ -33,6 +54,35 @@ public class DivingPack implements ModInitializer {
                     player.sendMessage(Text.literal(String.valueOf("Your current height is: " + playerBlockY)).formatted(Formatting.BLUE), true);
                 }
 
+            }
+        });
+
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                boolean wearsGoggles = isWearingArmorPiece(player, EquipmentSlot.HEAD, ModItems.DIVING_GOGGLES);
+
+                if (wearsGoggles) {
+                    boolean playerUnderwater = player.isSubmergedInWater();
+
+                    if (playerUnderwater) {
+                        for (LivingEntity entity : currentLivingEntitiesLoaded) {
+                            boolean entityUnderwater = entity.isSubmergedInWater();
+
+                            if (player.distanceTo(entity) <= 30.0f) {
+                                if (!entity.hasStatusEffect(StatusEffects.GLOWING)) {
+                                    entity.addStatusEffect(UNLIMITED_GLOWING);
+                                    player.sendMessage(Text.literal(String.valueOf("glowing given to:" + entity.getName())), false);
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    for (LivingEntity entity : currentLivingEntitiesLoaded) {
+                        boolean entityUnderwater = entity.isSubmergedInWater();
+                            entity.removeStatusEffect(StatusEffects.GLOWING);
+                    }
+                }
             }
         });
 
