@@ -24,13 +24,16 @@ public class DivingPack implements ModInitializer {
 
     StatusEffectInstance UNLIMITED_WATER_BREATHING = new StatusEffectInstance(StatusEffects.WATER_BREATHING,200, 0, false, false, true);
     StatusEffectInstance UNLIMITED_SPEED = new StatusEffectInstance(StatusEffects.SPEED,200, 0, false, false, true);
-    StatusEffectInstance UNLIMITED_GLOWING = new StatusEffectInstance(StatusEffects.GLOWING,200, 0, false, false, true);
+    StatusEffectInstance UNLIMITED_GLOWING = new StatusEffectInstance(StatusEffects.GLOWING, Integer.MAX_VALUE, 0, false, false, true);
 
     ArrayList<LivingEntity> currentLivingEntitiesLoaded = new ArrayList<>();
+
+    public static int visionRange = 30;
 
     @Override
     public void onInitialize() {
         ModItems.registerModItems();
+        DivingGogglesCommand.register();
 
         ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             if (entity instanceof LivingEntity) {
@@ -41,6 +44,7 @@ public class DivingPack implements ModInitializer {
 
         ServerEntityEvents.ENTITY_UNLOAD.register((entity, world) -> {
             if (entity instanceof LivingEntity) {
+                ((LivingEntity) entity).removeStatusEffect(StatusEffects.GLOWING);
                 currentLivingEntitiesLoaded.remove((LivingEntity) entity);
             }
         });
@@ -68,19 +72,23 @@ public class DivingPack implements ModInitializer {
                         for (LivingEntity entity : currentLivingEntitiesLoaded) {
                             boolean entityUnderwater = entity.isSubmergedInWater();
 
-                            if (player.distanceTo(entity) <= 30.0f) {
-                                if (!entity.hasStatusEffect(StatusEffects.GLOWING)) {
+                            if (player.distanceTo(entity) <= visionRange && entityUnderwater) {
                                     entity.addStatusEffect(UNLIMITED_GLOWING);
-                                    player.sendMessage(Text.literal(String.valueOf("glowing given to:" + entity.getName())), false);
-                                }
                             }
+                            else {
+                                entity.removeStatusEffect(StatusEffects.GLOWING);
+                            }
+                        }
+                    }
+                    else {
+                        for (LivingEntity entity : currentLivingEntitiesLoaded) {
+                            entity.removeStatusEffect(StatusEffects.GLOWING);
                         }
                     }
                 }
                 else {
                     for (LivingEntity entity : currentLivingEntitiesLoaded) {
-                        boolean entityUnderwater = entity.isSubmergedInWater();
-                            entity.removeStatusEffect(StatusEffects.GLOWING);
+                        entity.removeStatusEffect(StatusEffects.GLOWING);
                     }
                 }
             }

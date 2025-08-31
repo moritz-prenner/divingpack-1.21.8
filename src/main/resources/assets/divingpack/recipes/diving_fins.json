@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    "minecraft:leather_boots",
-    "minecraft:resin_brick"
-  ],
-  "result": {}
-}
